@@ -34,7 +34,7 @@ module updateRgTags 'updateRgTags.bicep' = {
   params: {
     rgName: resourceGroup().name
     rgLocation: resourceGroup().location
-    newTags: union(resourceGroup().tags ?? {}, tags )
+    newTags: union(resourceGroup().tags ?? {}, tags)
   }
 }
 
@@ -108,7 +108,7 @@ resource aiFoundry 'Microsoft.CognitiveServices/accounts@2025-10-01-preview' = {
   kind: 'AIServices'
   properties: {
     // required to work in Microsoft Foundry
-    allowProjectManagement: true 
+    allowProjectManagement: true
 
     // Defines developer API endpoint subdomain
     customSubDomainName: aiFoundryName
@@ -123,7 +123,7 @@ resource aiFoundry 'Microsoft.CognitiveServices/accounts@2025-10-01-preview' = {
   Developer APIs are exposed via a project, which groups in- and outputs that relate to one use case, including files.
   Its advisable to create one project right away, so development teams can directly get started.
   Projects may be granted individual RBAC permissions and identities on top of what account provides.
-*/ 
+*/
 resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-10-01-preview' = {
   name: aiProjectName
   parent: aiFoundry
@@ -203,7 +203,8 @@ resource appServiceApp 'Microsoft.Web/sites@2022-09-01' = {
       http20Enabled: true
       minTlsVersion: '1.2'
       appCommandLine: ''
-      appSettings: [{
+      appSettings: [
+        {
           name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
           value: 'false'
         }
@@ -222,7 +223,8 @@ resource appServiceApp 'Microsoft.Web/sites@2022-09-01' = {
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
           value: appInsights.properties.InstrumentationKey
-      }]
+        }
+      ]
     }
   }
   tags: tags
@@ -256,7 +258,10 @@ resource cosmosDbProjectOpenAIUserRole 'Microsoft.Authorization/roleAssignments@
   name: guid(aiProject.id, cosmosDbAccount.id, cognitiveServicesOpenAIUserRoleId)
   scope: aiProject
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', cognitiveServicesOpenAIUserRoleId)
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      cognitiveServicesOpenAIUserRoleId
+    )
     principalId: cosmosDbAccount.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -267,7 +272,10 @@ resource cosmosDbFoundryOpenAIUserRole 'Microsoft.Authorization/roleAssignments@
   name: guid(aiFoundry.id, cosmosDbAccount.id, cognitiveServicesOpenAIUserRoleId)
   scope: aiFoundry
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', cognitiveServicesOpenAIUserRoleId)
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      cognitiveServicesOpenAIUserRoleId
+    )
     principalId: cosmosDbAccount.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -278,7 +286,10 @@ resource cosmosDbProjectContributorRole 'Microsoft.Authorization/roleAssignments
   name: guid(aiProject.id, cosmosDbAccount.id, cognitiveServicesContributorRoleId)
   scope: aiProject
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', cognitiveServicesContributorRoleId)
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      cognitiveServicesContributorRoleId
+    )
     principalId: cosmosDbAccount.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -289,4 +300,3 @@ output storageAccountName string = storageAccount.name
 output container_registry_name string = containerRegistry.name
 output application_name string = appServiceApp.name
 output application_url string = appServiceApp.properties.hostNames[0]
-
